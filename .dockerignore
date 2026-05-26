@@ -1,0 +1,31 @@
+# Version control
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments / dependency managers
+.venv
+venv
+env
+Pipfile
+Pipfile.lock
+
+# Streamlit local overrides (secrets, credentials — NOT config.toml)
+.streamlit/secrets.toml
+
+# Dev / editor artifacts
+.claude
+*.md
+Makefile
+app.py
+
+# Test / CI
+.pytest_cache
+.coverage
+htmlcov

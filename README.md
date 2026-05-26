@@ -304,7 +304,7 @@ See `data/schema.md` for full field definitions. Adding a new book = adding rows
 
 #### Story 3.1 — Dockerfile
 
-**Context:** Epic 2 complete. App is fully functional locally.
+**Context:** App is fully functional locally.
 
 **Assumptions:**
 - Python 3.12
