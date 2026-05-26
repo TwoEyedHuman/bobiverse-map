@@ -1,3 +1,10 @@
+import os
+import sys
+
+# Ensure project root is on sys.path so `app.*` imports resolve
+# when Streamlit runs this file directly (it adds app/ not root).
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pandas as pd
 import streamlit as st
 
