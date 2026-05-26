@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for bobiverse-tracker on 2026-05-26T17:52:12-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = 'bobiverse-tracker'
 primary_region = 'iad'
 
@@ -16,13 +21,14 @@ primary_region = 'iad'
     soft_limit = 5
 
   [[http_service.checks]]
-    grace_period = '30s'
     interval = '15s'
-    method = 'GET'
     timeout = '5s'
+    grace_period = '30s'
+    method = 'GET'
     path = '/_stcore/health'
 
 [[vm]]
   memory = '256mb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 256
