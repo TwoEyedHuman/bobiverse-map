@@ -42,8 +42,7 @@ Defined in `app/data.py` → `SYSTEM_COORDS`:
 - Tau Ceti
 - Epsilon Indi
 
-> **Note:** The source CSV contains a typo `"Epislon Indi"` for one Linus entry (Apr/2165).
-> This is preserved as-is in `bobs.json`; that Bob will render at coords `(0, 0)` until corrected.
+> **Note:** The source CSV contains a typo `"Epislon Indi"` for one Linus entry (Apr/2165); corrected to `"Epsilon Indi"` in `bobs.json`.
 
 ## Conventions
 
