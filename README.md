@@ -349,7 +349,7 @@ See `data/schema.md` for full field definitions. Adding a new book = adding rows
 
 **Assumptions:**
 - `fly` CLI installed and authenticated
-- Cloudflare DNS available for `brandonlocke.xyz`
+- Namecheap DNS available for `brandonlocke.xyz`
 - Personal site's Fly.io account will host this as a separate app
 
 **Tasks:**
@@ -385,7 +385,7 @@ See `data/schema.md` for full field definitions. Adding a new book = adding rows
   ```
 - `fly deploy` — verify app is live at `.fly.dev` URL
 - `fly certs add bobiverse.brandonlocke.xyz`
-- Add Cloudflare DNS CNAME: `bobiverse` → `bobiverse-tracker.fly.dev`
+- Add Namecheap DNS CNAME: `bobiverse` → `bobiverse-tracker.fly.dev`
 
 **Acceptance Criteria:**
 - [ ] `fly deploy` succeeds
