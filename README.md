@@ -426,6 +426,282 @@ See `data/schema.md` for full field definitions. Adding a new book = adding rows
 
 ---
 
+## Migration — Streamlit → Fast Static Web App
+
+**Goal:** Eliminate the long startup time by moving from a Streamlit/Python server app to a static JavaScript web app.
+
+The startup latency is **architectural**, not data-related. The dataset is tiny (`data/bobs.json`, ~120 entries / 10 systems) and all position math is trivial arithmetic. Four compounding costs cause the delay:
+
+| Cause | Detail |
+|---|---|
+| **Fly cold start** | `min_machines_running = 0` + `auto_stop_machines = 'stop'` → container boots from cold on every idle visit. |
+| **Python import cost** | `import streamlit, pandas, plotly` takes seconds on a 256mb shared-CPU VM, before any code runs. |
+| **Streamlit runtime model** | Server boots → browser downloads a large JS bundle → opens a websocket → server re-runs the *entire* script per interaction. Slow even when warm. |
+| **RAM-starved VM** | pandas + plotly in 256mb leaves little headroom. |
+
+A static site removes all four: no server boot, no Python, no websocket, no cold machine. Assets served from a CDN; interactive on first paint.
+
+### Target Architecture
+
+```
+Browser → CDN / Static Host (Cloudflare Pages) → static bundle (HTML + JS + bobs.json)
+                                                    ├── Timeline slider (client state)
+                                                    ├── Position compute (ported from app/data.py → JS)
+                                                    ├── SVG map render (no chart server)
+                                                    └── Status table (client state)
+```
+
+### Technology Choices
+
+| Layer | Choice | Reason |
+|---|---|---|
+| Framework | **SvelteKit** (`adapter-static`) | Smallest runtime; first-class static export. Astro / SolidStart acceptable alternatives. |
+| Chart | **Plain SVG** (D3 only for scales, optional) | Map is ~10 systems + N bobs + a few lines. SVG is tiny + instant; avoids Plotly.js (~3MB). |
+| Data | `data/bobs.json` (unchanged) | Already static; shipped as a build asset. |
+| Hosting | **Cloudflare Pages** | Free, global CDN, no cold start, Git-push deploys. GitHub Pages / Netlify equivalent. |
+| CI/CD | GitHub Actions | Build + deploy on push to `main`. |
+
+> **Decision point:** confirm **SvelteKit + SVG** before starting Epic 5. If interactive pan/zoom on the map is a hard requirement, swap SVG for lazy-loaded Plotly.js — but that reintroduces a large bundle and partly defeats the goal.
+
+### What Carries Over
+
+- **`data/bobs.json`** — used as-is, no schema change.
+- **`SYSTEM_COORDS`** (`app/data.py:7`) — ported verbatim to a JS constant.
+- **Position logic** (`compute_positions`, `app/data.py:35`) — ported verbatim to JS (pure arithmetic, no pandas).
+- **Anti-stacking jitter** (`build_map`, `app/map.py:32`) — ported to JS.
+- **Dark / iframe-clean theme** (`.streamlit/config.toml`) — recreated in CSS.
+
+Retired at cutover: Streamlit, pandas, plotly, `Dockerfile`, the Fly app, the Python deploy workflow, redundant root `app.py`.
+
+---
+
+### EPIC 5 — Static App Scaffold
+
+**Epic Goal:** A SvelteKit static project builds to a folder of static assets and serves a blank themed page locally and from a preview deploy.
+
+---
+
+#### Story 5.1 — Scaffold SvelteKit + Static Adapter
+
+**Context:** Repo is currently Python-only. Introduce the JS app in a `web/` subfolder so the legacy app keeps running until cutover.
+
+**Tasks:**
+- `npm create svelte@latest web` — skeleton project, TypeScript optional.
+- Install and configure `@sveltejs/adapter-static` for full static export.
+- Add `web/.gitignore` (node_modules, build, .svelte-kit).
+- Confirm `npm run dev` serves a blank page and `npm run build` produces static `web/build/`.
+
+**Out of Scope:** Any map logic, data, or deploy.
+
+**Acceptance Criteria:**
+- [ ] `cd web && npm run dev` serves a page at `localhost:5173`
+- [ ] `npm run build` produces a static `build/` directory (HTML/JS/CSS, no server)
+- [ ] `npx serve web/build` serves the built page with no backend process
+
+---
+
+#### Story 5.2 — Base Layout, Theme & Iframe Embed
+
+**Context:** Story 5.1 complete. App embeds via iframe on the personal site, so it must be clean and dark like the current Streamlit config.
+
+**Tasks:**
+- Global dark theme CSS matching `plotly_dark` (`#111` background, `#333` gridlines, light text).
+- App title `🌌 Bobiverse Tactical Movement Map`.
+- Responsive layout usable at ~800px (iframe) and ~600px (mobile).
+- No external chrome/toolbar (parity with `toolbarMode = "minimal"`).
+
+**Acceptance Criteria:**
+- [ ] Page renders dark, full-bleed, no scroll chrome, at 800px width
+- [ ] Renders cleanly inside a test `<iframe width="800">`
+- [ ] Lighthouse Performance ≥ 95 on the blank themed page
+
+---
+
+### EPIC 5 Integration Gate
+
+- [ ] `npm run build` → static folder serves with zero server processes
+- [ ] Page loads dark-themed in an iframe at 800px
+- [ ] First paint is effectively instant (no spinner, no websocket)
+
+---
+
+### EPIC 6 — Port Data & Domain Logic to JS
+
+**Epic Goal:** All Python position logic runs in the browser against the existing `bobs.json`, producing identical results.
+
+---
+
+#### Story 6.1 — Data Loading & Coordinates
+
+**Context:** `data/bobs.json` and `SYSTEM_COORDS` are the source of truth.
+
+**Tasks:**
+- Copy/symlink `data/bobs.json` into `web/static/` (or `src/lib/data/`) so it ships in the bundle.
+- Port `SYSTEM_COORDS` (`app/data.py:7`) to a JS constant.
+- Load + parse the JSON at runtime; parse `assumed_date` to JS `Date`; sort by `(bob, assumed_date)` — parity with `load_data()` (`app/data.py:25`).
+- Derive `min_date` / `max_date` for the slider range.
+
+**Acceptance Criteria:**
+- [ ] All bobs and systems load from `bobs.json` with no hardcoded data
+- [ ] Date range matches the current Streamlit slider bounds
+- [ ] `get_coords` fallback to `(0,0)` for unknown systems preserved
+
+---
+
+#### Story 6.2 — Port Position Computation
+
+**Context:** Story 6.1 complete. This is the core domain logic.
+
+**Tasks:**
+- Port `compute_positions` (`app/data.py:35`) to JS: for each bob at a selected date, find last past entry + first future entry; interpolate `(x, y)` by time fraction; compute heading `angle = 90 - atan2(dy, dx)*180/π`; set `is_traveling`, `status`, `last_date`, `path`.
+- Port anti-stacking orbit jitter from `build_map` (`app/map.py:32`): cluster bobs by rounded coords; offset stationary co-located bobs around a 0.7 radius circle.
+- Keep this as a pure function (df + date → positions) for testing.
+
+**Acceptance Criteria:**
+- [ ] For a fixed sample date, JS output matches Python `compute_positions` (coords within float tolerance, same status strings)
+- [ ] Travel interpolation and heading angle match Python for a traveling bob
+- [ ] Co-located stationary bobs get distinct jittered positions
+
+---
+
+### EPIC 6 Integration Gate
+
+- [ ] Picking any date computes positions for every bob with no errors
+- [ ] Spot-check 3 dates against the live Streamlit app → positions/status match
+
+---
+
+### EPIC 7 — Map Render & Interaction
+
+**Epic Goal:** The SVG map and timeline reproduce the current app's behavior, instantly and interactively, with no server round-trip.
+
+---
+
+#### Story 7.1 — Render the Map (SVG)
+
+**Context:** Epic 6 provides computed positions.
+
+**Tasks:**
+- Map domain coords → SVG pixel space (linear scales; D3 `scaleLinear` optional).
+- Draw star systems: muted markers + `bottom center` labels (parity `app/map.py:18`).
+- Draw bobs: triangle markers rotated by `angle`, per-bob color, `top center` label.
+- Draw travel paths: dotted lines colored per bob (parity legendgroup behavior).
+- Dark theme, gridlines, axis labels `LY (X)` / `LY (Y)`.
+
+**Acceptance Criteria:**
+- [ ] All 10 systems render labeled at correct relative positions
+- [ ] Each bob is a distinct color with a rotated heading triangle
+- [ ] Traveling bobs show a dotted path in their color
+- [ ] Visual parity with the current Streamlit map at the same date
+
+---
+
+#### Story 7.2 — Timeline Slider & Reactive Update
+
+**Context:** Story 7.1 complete.
+
+**Tasks:**
+- Timeline slider over `[min_date, max_date]`, `MMM YYYY` label (parity `chapter_selector.py`).
+- Map re-renders reactively on slider change — pure client state, no reload, no network.
+- Default to `min_date`.
+
+**Acceptance Criteria:**
+- [ ] Dragging the slider updates the map with no perceptible lag and no network call
+- [ ] Slider label shows `MMM YYYY`
+- [ ] Initial state matches the current app (earliest date)
+
+---
+
+#### Story 7.3 — Tactical Status Table
+
+**Context:** Story 7.2 complete.
+
+**Tasks:**
+- Below the map: `Tactical Status: <date>` heading + table of `Bob | Status | Last Log` (parity `main.py:25`, `build_map` status list).
+- Table updates with the slider.
+
+**Acceptance Criteria:**
+- [ ] Table lists every active bob with status + last-log date for the selected date
+- [ ] Heading shows the selected date
+- [ ] Table updates in sync with the map
+
+---
+
+### EPIC 7 Integration Gate
+
+- [ ] Full journey: load → drag slider across timeline → map + table update live
+- [ ] Side-by-side with Streamlit at 3 dates → visual + status parity
+- [ ] No console errors; interaction is instant
+
+---
+
+### EPIC 8 — Static Deploy & Cutover
+
+**Epic Goal:** The static app is live on a CDN with no cold start, auto-deploys on push, and the legacy Streamlit/Fly stack is retired.
+
+---
+
+#### Story 8.1 — Static Hosting + CI/CD
+
+**Context:** Epic 7 complete. App builds to static assets.
+
+**Tasks:**
+- Set up Cloudflare Pages (or GitHub Pages / Netlify) pointing at `web/`.
+- `.github/workflows/web-deploy.yml`: on push to `main` → `npm ci && npm run build` → publish `web/build`.
+- PR workflow: build + lint only (no deploy).
+- Verify a preview URL loads instantly.
+
+**Acceptance Criteria:**
+- [ ] Push to `main` → build + deploy completes in a few minutes
+- [ ] Preview/prod URL loads with no cold start (cold visit ≤ ~1s to interactive)
+- [ ] PR triggers build only, no deploy
+
+---
+
+#### Story 8.2 — Custom Domain & Iframe Embed
+
+**Context:** Story 8.1 complete.
+
+**Tasks:**
+- Point the existing hostname (`bobiverse.brandonlocke.xyz`) at the new static host via DNS/CNAME.
+- Update the personal site iframe `src` to the new URL.
+- Confirm TLS and the dark iframe embed.
+
+**Acceptance Criteria:**
+- [ ] Custom domain serves the static app over HTTPS
+- [ ] Personal site iframe shows the new app, dark and clean
+- [ ] Cold-visit load dramatically faster than Streamlit (measure + record before/after)
+
+---
+
+#### Story 8.3 — Retire Legacy Streamlit Stack
+
+**Context:** New app is live and verified. Remove dead weight.
+
+**Tasks:**
+- Remove (or archive) `app/`, root `app.py`, `Dockerfile`, `.dockerignore`, `requirements.txt`, `Pipfile`, `Pipfile.lock`, `.streamlit/`, the Fly deploy workflow, `fly.toml`.
+- Stop/destroy the Fly `bobiverse-tracker` app.
+- Update this README's front matter (Architecture, Tech Stack, Environment) to describe the static architecture.
+- Keep `data/bobs.json` + `data/schema.md` as the data source of truth.
+
+**Acceptance Criteria:**
+- [ ] No Python/Streamlit/Fly references remain in active config
+- [ ] Fly app stopped/destroyed (no further billing)
+- [ ] README front matter reflects the static architecture
+- [ ] Repo builds and deploys solely via the JS toolchain
+
+---
+
+### EPIC 8 Integration Gate
+
+- [ ] Cold-visit load time measured + recorded — before (Streamlit) vs after (static)
+- [ ] Push a label change → auto-deploys → visible on the live domain
+- [ ] Legacy stack fully removed; no orphaned Fly machine
+
+> **Rollback:** The legacy Streamlit app stays deployable until Story 8.3. The new app lives in `web/` and deploys to a separate URL, so cutover is just a DNS + iframe `src` change. To roll back: point DNS at the Fly app and revert the iframe `src`. Do not run Story 8.3 until the static app is verified live on the production domain.
+
+---
+
 ## Secrets & Config Management
 
 No secrets required — all data is static and baked into the Docker image. If future features require an API key (e.g. for book data enrichment), add via:
