@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { SYSTEM_COORDS } from './data/coords';
 	import type { JitteredPosition } from './data/positions';
-	import { colorForBob } from './colors';
+
+	// All bobs share one color (markers, labels, paths), distinct from the
+	// grey star labels / white star markers.
+	const BOB_COLOR = '#ffb454';
 
 	let { positions }: { positions: JitteredPosition[] } = $props();
 
@@ -83,7 +86,7 @@
 					y1={scaleY(p.path.y[0])}
 					x2={scaleX(p.path.x[1])}
 					y2={scaleY(p.path.y[1])}
-					stroke={colorForBob(p.name)}
+					stroke={BOB_COLOR}
 					stroke-width="1.5"
 					stroke-dasharray="4 4"
 				/>
@@ -96,15 +99,15 @@
 		{#each positions as p (p.name)}
 			<g transform={`translate(${scaleX(p.displayX)}, ${scaleY(p.displayY)})`}>
 				{#if p.isTraveling}
-					<path d={TRI} transform={`rotate(${p.angle})`} fill={colorForBob(p.name)} />
+					<path d={TRI} transform={`rotate(${p.angle})`} fill={BOB_COLOR} />
 				{:else}
-					<rect x="-6" y="-6" width="12" height="12" fill={colorForBob(p.name)} />
+					<rect x="-4" y="-4" width="8" height="8" fill={BOB_COLOR} />
 				{/if}
 				<text
 					class="bob-label"
 					y={-12 + (labelDy.get(p.name) ?? 0)}
 					text-anchor="middle"
-					fill={colorForBob(p.name)}
+					fill={BOB_COLOR}
 				>
 					{p.name}
 				</text>
