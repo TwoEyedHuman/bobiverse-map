@@ -25,6 +25,10 @@
 	// the map renders. ISO date matches Streamlit's `selected_date.date()`.
 	const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 	const statusDate = $derived(isoDate(selectedDate));
+
+	// Display-only relabel; underlying status strings stay parity-locked to Python.
+	const statusLabel = (s: string) =>
+		s.replace(/^Stationary at /, 'At ').replace(/^Traveling to /, 'Enroute to ');
 </script>
 
 <main>
@@ -60,7 +64,7 @@
 						{#each positions as p (p.name)}
 							<tr>
 								<td>{p.name}</td>
-								<td>{p.status}</td>
+								<td>{statusLabel(p.status)}</td>
 								<td>{isoDate(p.lastDate)}</td>
 							</tr>
 						{/each}

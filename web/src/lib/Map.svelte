@@ -32,6 +32,27 @@
 	// Triangle-up marker (points up by default), centered on origin; rotated by
 	// `angle` degrees clockwise to face the direction of travel.
 	const TRI = 'M 0,-8 L 7,6 L -7,6 Z';
+
+	// Label de-collision. In-transit bobs interpolate freely and aren't orbit-
+	// jittered like co-located stationary ones, so their name labels can land on
+	// top of each other. Greedily stack any colliding label upward by a line.
+	const LABEL_DX = 46; // px horizontal proximity that counts as a collision
+	const LABEL_DY = 13; // line height to bump a colliding label
+	const labelDy = $derived.by(() => {
+		const placed: { x: number; y: number }[] = [];
+		const offsets = new Map<string, number>();
+		for (const p of positions) {
+			const px = scaleX(p.displayX);
+			const baseY = scaleY(p.displayY) - 12;
+			let y = baseY;
+			while (placed.some((q) => Math.abs(q.x - px) < LABEL_DX && Math.abs(q.y - y) < LABEL_DY)) {
+				y -= LABEL_DY;
+			}
+			placed.push({ x: px, y });
+			offsets.set(p.name, y - baseY);
+		}
+		return offsets;
+	});
 </script>
 
 <svg
@@ -74,8 +95,17 @@
 	<g class="bobs">
 		{#each positions as p (p.name)}
 			<g transform={`translate(${scaleX(p.displayX)}, ${scaleY(p.displayY)})`}>
-				<path d={TRI} transform={`rotate(${p.angle})`} fill={colorForBob(p.name)} />
-				<text class="bob-label" y="-12" text-anchor="middle" fill={colorForBob(p.name)}>
+				{#if p.isTraveling}
+					<path d={TRI} transform={`rotate(${p.angle})`} fill={colorForBob(p.name)} />
+				{:else}
+					<rect x="-6" y="-6" width="12" height="12" fill={colorForBob(p.name)} />
+				{/if}
+				<text
+					class="bob-label"
+					y={-12 + (labelDy.get(p.name) ?? 0)}
+					text-anchor="middle"
+					fill={colorForBob(p.name)}
+				>
 					{p.name}
 				</text>
 			</g>
