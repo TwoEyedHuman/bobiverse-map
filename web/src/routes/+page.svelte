@@ -19,6 +19,12 @@
 	const sliderLabel = $derived(
 		selectedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })
 	);
+
+	// Parity with main.py:25 — `Tactical Status: <date>` + table of
+	// Bob | Status | Last Log, built from the same cluster-ordered positions
+	// the map renders. ISO date matches Streamlit's `selected_date.date()`.
+	const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+	const statusDate = $derived(isoDate(selectedDate));
 </script>
 
 <main>
@@ -38,6 +44,27 @@
 	<div class="map-area">
 		<Map {positions} />
 	</div>
+	<section class="status">
+		<h2>Tactical Status: {statusDate}</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Bob</th>
+					<th>Status</th>
+					<th>Last Log</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each positions as p (p.name)}
+					<tr>
+						<td>{p.name}</td>
+						<td>{p.status}</td>
+						<td>{isoDate(p.lastDate)}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</section>
 </main>
 
 <style>
@@ -85,6 +112,40 @@
 	.map-area {
 		flex: 1;
 		min-height: 0;
+	}
+
+	.status {
+		margin-top: 0.75rem;
+	}
+
+	.status h2 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: #e0e0e0;
+	}
+
+	.status table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.85rem;
+		color: #c0c0c0;
+	}
+
+	.status th,
+	.status td {
+		text-align: left;
+		padding: 0.35rem 0.5rem;
+		border-bottom: 1px solid #333;
+	}
+
+	.status th {
+		font-weight: 600;
+		color: #e0e0e0;
+	}
+
+	.status td {
+		font-variant-numeric: tabular-nums;
 	}
 
 	@media (max-width: 600px) {
