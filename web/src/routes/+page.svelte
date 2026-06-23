@@ -1,6 +1,18 @@
+<script lang="ts">
+	import { bobRecords, maxDate } from '$lib/data/bobs';
+	import { computePositions, applyJitter } from '$lib/data/positions';
+	import Map from '$lib/Map.svelte';
+
+	// Timeline slider arrives in story 7.2; render at the latest date for now.
+	const selectedDate = maxDate;
+	const positions = applyJitter(computePositions(bobRecords, selectedDate));
+</script>
+
 <main>
 	<h1>🌌 Bobiverse Tactical Movement Map</h1>
-	<div class="map-area"></div>
+	<div class="map-area">
+		<Map {positions} />
+	</div>
 </main>
 
 <style>
