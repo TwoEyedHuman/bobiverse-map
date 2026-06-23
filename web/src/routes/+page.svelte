@@ -28,9 +28,9 @@
 </script>
 
 <main>
-	<h1>🌌 Bobiverse Tactical Movement Map</h1>
-	<div class="controls">
-		<label for="timeline">Timeline Date</label>
+	<div class="timebar">
+		<span class="brand">🌌 BOBIVERSE</span>
+		<label for="timeline">◤ TIMELINE ◢</label>
 		<input
 			id="timeline"
 			type="range"
@@ -41,30 +41,34 @@
 		/>
 		<span class="slider-value">{sliderLabel}</span>
 	</div>
-	<div class="map-area">
-		<Map {positions} />
+	<div class="content">
+		<div class="map-area">
+			<Map {positions} />
+		</div>
+		<aside class="status">
+			<h2>Tactical Status<span class="status-date">{statusDate}</span></h2>
+			<div class="status-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Bob</th>
+							<th>Status</th>
+							<th>Last Log</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each positions as p (p.name)}
+							<tr>
+								<td>{p.name}</td>
+								<td>{p.status}</td>
+								<td>{isoDate(p.lastDate)}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		</aside>
 	</div>
-	<section class="status">
-		<h2>Tactical Status: {statusDate}</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>Bob</th>
-					<th>Status</th>
-					<th>Last Log</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each positions as p (p.name)}
-					<tr>
-						<td>{p.name}</td>
-						<td>{p.status}</td>
-						<td>{isoDate(p.lastDate)}</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</section>
 </main>
 
 <style>
@@ -73,70 +77,148 @@
 		flex-direction: column;
 		width: 100%;
 		height: 100vh;
-		padding: 0.5rem 0.75rem;
+		padding: 0;
+		gap: 0;
 	}
 
-	h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.1rem;
-		font-weight: 600;
-		color: #e0e0e0;
-	}
-
-	.controls {
+	/* Sci-fi timeline bar across the whole top */
+	.timebar {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		margin-bottom: 0.5rem;
-		font-size: 0.85rem;
-		color: #c0c0c0;
+		gap: 1rem;
+		width: 100%;
+		padding: 0.6rem 1.25rem;
+		background: linear-gradient(180deg, #0a1424 0%, #050a14 100%);
+		border-bottom: 1px solid #1e3a5f;
+		box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
 	}
 
-	.controls label {
-		font-weight: 600;
+	.brand {
+		font-weight: 700;
+		font-size: 0.9rem;
+		letter-spacing: 0.08em;
+		color: #e0e0e0;
 		white-space: nowrap;
 	}
 
-	.controls input[type='range'] {
+	.timebar label {
+		font-family: 'Courier New', monospace;
+		font-weight: 700;
+		font-size: 0.8rem;
+		letter-spacing: 0.2em;
+		color: #22d3ee;
+		text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+		white-space: nowrap;
+	}
+
+	.timebar input[type='range'] {
 		flex: 1;
-		max-width: 480px;
-		accent-color: #7aa2f7;
+		appearance: none;
+		-webkit-appearance: none;
+		height: 4px;
+		border-radius: 2px;
+		background: linear-gradient(90deg, #22d3ee 0%, #1e3a5f 100%);
+		box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+		outline: none;
+		cursor: pointer;
+	}
+
+	.timebar input[type='range']::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background: #e0fbff;
+		border: 2px solid #22d3ee;
+		box-shadow: 0 0 10px rgba(34, 211, 238, 0.9);
+		cursor: pointer;
+	}
+
+	.timebar input[type='range']::-moz-range-thumb {
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background: #e0fbff;
+		border: 2px solid #22d3ee;
+		box-shadow: 0 0 10px rgba(34, 211, 238, 0.9);
+		cursor: pointer;
 	}
 
 	.slider-value {
-		min-width: 5.5rem;
+		min-width: 6rem;
+		text-align: right;
+		font-family: 'Courier New', monospace;
 		font-variant-numeric: tabular-nums;
-		color: #e0e0e0;
+		letter-spacing: 0.05em;
+		color: #22d3ee;
+		text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
 	}
 
-	.map-area {
+	/* Map (left, fills) + status table (right, narrow) */
+	.content {
+		display: flex;
 		flex: 1;
 		min-height: 0;
 	}
 
+	.map-area {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.status {
-		margin-top: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		width: 260px;
+		min-height: 0;
+		border-left: 1px solid #1e3a5f;
+		background: #0a0f18;
 	}
 
 	.status h2 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1rem;
+		display: flex;
+		flex-direction: column;
+		margin: 0;
+		padding: 0.6rem 0.75rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 		color: #e0e0e0;
+		border-bottom: 1px solid #1e3a5f;
+	}
+
+	.status-date {
+		font-family: 'Courier New', monospace;
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: #22d3ee;
+	}
+
+	.status-scroll {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
 	}
 
 	.status table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 0.85rem;
+		font-size: 0.78rem;
 		color: #c0c0c0;
+	}
+
+	.status thead th {
+		position: sticky;
+		top: 0;
+		background: #0a0f18;
+		z-index: 1;
 	}
 
 	.status th,
 	.status td {
 		text-align: left;
-		padding: 0.35rem 0.5rem;
-		border-bottom: 1px solid #333;
+		padding: 0.3rem 0.5rem;
+		border-bottom: 1px solid #1a2330;
 	}
 
 	.status th {
@@ -146,11 +228,5 @@
 
 	.status td {
 		font-variant-numeric: tabular-nums;
-	}
-
-	@media (max-width: 600px) {
-		h1 {
-			font-size: 0.95rem;
-		}
 	}
 </style>

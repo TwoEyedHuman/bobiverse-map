@@ -8,7 +8,7 @@
 	// SVG canvas (rendered responsively via viewBox + preserveAspectRatio).
 	const WIDTH = 960;
 	const HEIGHT = 720;
-	const MARGIN = { top: 24, right: 24, bottom: 48, left: 60 };
+	const MARGIN = { top: 24, right: 24, bottom: 24, left: 24 };
 	const innerW = WIDTH - MARGIN.left - MARGIN.right;
 	const innerH = HEIGHT - MARGIN.top - MARGIN.bottom;
 
@@ -27,25 +27,6 @@
 	const scaleX = (x: number) => MARGIN.left + ((x - xMin) / (xMax - xMin)) * innerW;
 	const scaleY = (y: number) => MARGIN.top + ((yMax - y) / (yMax - yMin)) * innerH;
 
-	function ticks(min: number, max: number, count: number): number[] {
-		const span = max - min;
-		if (span <= 0) return [min];
-		let step = 10 ** Math.floor(Math.log10(span / count));
-		const err = span / count / step;
-		if (err >= 7.5) step *= 10;
-		else if (err >= 3.5) step *= 5;
-		else if (err >= 1.5) step *= 2;
-		const start = Math.ceil(min / step) * step;
-		const out: number[] = [];
-		for (let v = start; v <= max + step * 1e-9; v += step) {
-			out.push(Math.round(v / step) * step);
-		}
-		return out;
-	}
-
-	const xTicks = $derived(ticks(xMin, xMax, 8));
-	const yTicks = $derived(ticks(yMin, yMax, 6));
-
 	const systems = Object.entries(SYSTEM_COORDS);
 
 	// Triangle-up marker (points up by default), centered on origin; rotated by
@@ -61,40 +42,6 @@
 	aria-label="Bobiverse tactical movement map"
 >
 	<rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#111111" />
-
-	<!-- Gridlines -->
-	<g class="grid">
-		{#each xTicks as tx (tx)}
-			<line x1={scaleX(tx)} y1={MARGIN.top} x2={scaleX(tx)} y2={MARGIN.top + innerH} />
-		{/each}
-		{#each yTicks as ty (ty)}
-			<line x1={MARGIN.left} y1={scaleY(ty)} x2={MARGIN.left + innerW} y2={scaleY(ty)} />
-		{/each}
-	</g>
-
-	<!-- Axes -->
-	<g class="axis">
-		<line x1={MARGIN.left} y1={MARGIN.top + innerH} x2={MARGIN.left + innerW} y2={MARGIN.top + innerH} />
-		<line x1={MARGIN.left} y1={MARGIN.top} x2={MARGIN.left} y2={MARGIN.top + innerH} />
-		{#each xTicks as tx (tx)}
-			<text x={scaleX(tx)} y={MARGIN.top + innerH + 18} text-anchor="middle">{tx}</text>
-		{/each}
-		{#each yTicks as ty (ty)}
-			<text x={MARGIN.left - 8} y={scaleY(ty) + 4} text-anchor="end">{ty}</text>
-		{/each}
-		<text class="axis-title" x={MARGIN.left + innerW / 2} y={HEIGHT - 8} text-anchor="middle">
-			LY (X)
-		</text>
-		<text
-			class="axis-title"
-			x={16}
-			y={MARGIN.top + innerH / 2}
-			text-anchor="middle"
-			transform={`rotate(-90, 16, ${MARGIN.top + innerH / 2})`}
-		>
-			LY (Y)
-		</text>
-	</g>
 
 	<!-- Star systems -->
 	<g class="systems">
@@ -141,26 +88,6 @@
 		width: 100%;
 		height: 100%;
 		display: block;
-	}
-
-	.grid line {
-		stroke: #333333;
-		stroke-width: 1;
-	}
-
-	.axis line {
-		stroke: #555555;
-		stroke-width: 1;
-	}
-
-	.axis text {
-		fill: #aaaaaa;
-		font-size: 12px;
-	}
-
-	.axis-title {
-		fill: #cccccc;
-		font-size: 13px;
 	}
 
 	.system-label {
