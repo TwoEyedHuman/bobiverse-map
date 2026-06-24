@@ -1,10 +1,26 @@
-.PHONY: web web-build web-preview
+.PHONY: dev build docker-build docker-run docker-kill
 
-web:
+IMAGE := bobiverse-tracker:test
+CONTAINER := bobiverse-tracker
+DOCKER_STAMP := .docker-build-stamp
+DOCKER_SRC := Dockerfile $(shell find web/src web/static -type f) web/package.json web/package-lock.json
+
+dev:
 	cd web && npm run dev
 
-web-build:
+build:
 	cd web && npm run build
 
-web-preview:
-	cd web && npm run preview
+$(DOCKER_STAMP): $(DOCKER_SRC)
+	docker build -t $(IMAGE) .
+	touch $(DOCKER_STAMP)
+
+docker-build: $(DOCKER_STAMP)
+
+docker-run: docker-build
+	@docker run -d --rm -p 80 --name $(CONTAINER) $(IMAGE); \
+	port=$$(docker port $(CONTAINER) 80/tcp | head -1 | cut -d: -f2); \
+	echo "$(CONTAINER) running at http://localhost:$$port"
+
+docker-kill:
+	@docker ps -q --filter name=$(CONTAINER) | xargs -r docker kill
