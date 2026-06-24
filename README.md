@@ -637,68 +637,86 @@ Retired at cutover: Streamlit, pandas, plotly, `Dockerfile`, the Fly app, the Py
 
 ### EPIC 8 — Static Deploy & Cutover
 
-**Epic Goal:** The static app is live on a CDN with no cold start, auto-deploys on push, and the legacy Streamlit/Fly stack is retired.
+**Epic Goal:** The static app is served from Fly.io (same account as the personal site, to keep hosting centralized), auto-deploys on push, and the legacy Streamlit build is retired.
+
+> **Hosting decision:** Stay on Fly.io rather than a CDN (Cloudflare/Netlify/GitHub Pages). The trade-off is a small machine-wake latency on the first request after idle instead of a true zero-cold-start CDN edge. For a tiny static-nginx image the wake is sub-second, and keeping everything under one Fly account/billing/DNS setup is worth more here than shaving that last fraction. If cold start ever becomes a problem, set `min_machines_running = 1` (one always-on shared-cpu machine is cheap) or move to Fly's static-site offering.
 
 ---
 
-#### Story 8.1 — Static Hosting + CI/CD
+#### Story 8.1 — Static Container + Fly Deploy
 
-**Context:** Epic 7 complete. App builds to static assets.
+**Context:** Epic 7 complete. `web/` builds to static assets in `web/build` via `adapter-static`.
 
 **Tasks:**
-- Set up Cloudflare Pages (or GitHub Pages / Netlify) pointing at `web/`.
-- `.github/workflows/web-deploy.yml`: on push to `main` → `npm ci && npm run build` → publish `web/build`.
-- PR workflow: build + lint only (no deploy).
-- Verify a preview URL loads instantly.
+- Replace the Streamlit `Dockerfile` with a multi-stage build: a Node stage runs `npm ci && npm run build` in `web/`, then copy `web/build` into a minimal static server stage (`nginx:alpine` serving `/usr/share/nginx/html`, or equivalent). Expose port 80.
+- Rewrite `fly.toml` for the static service: `internal_port = 80`, `force_https = true`, `auto_stop_machines`/`auto_start_machines` on, `min_machines_running = 0`, health check `GET /`. Keep app name `bobiverse-tracker` so the existing cert/DNS carry over.
+- Update `.dockerignore` for the Node build (ignore `node_modules`, keep `web/`).
+- Build + run the image locally, confirm the map loads on the mapped port.
 
 **Acceptance Criteria:**
-- [ ] Push to `main` → build + deploy completes in a few minutes
-- [ ] Preview/prod URL loads with no cold start (cold visit ≤ ~1s to interactive)
-- [ ] PR triggers build only, no deploy
+- [ ] `docker build` + `docker run` serves the static app locally on port 80
+- [ ] Image is small (static nginx, no Python/Streamlit layers)
+- [ ] `fly.toml` targets the static service and scales to zero
 
 ---
 
-#### Story 8.2 — Custom Domain & Iframe Embed
+#### Story 8.2 — CI/CD on Fly
 
 **Context:** Story 8.1 complete.
 
 **Tasks:**
-- Point the existing hostname (`bobiverse.brandonlocke.xyz`) at the new static host via DNS/CNAME.
-- Update the personal site iframe `src` to the new URL.
-- Confirm TLS and the dark iframe embed.
+- Update `.github/workflows/deploy.yml`: on push to `main` → build `web/` (`npm ci && npm run build` or let the Dockerfile build) → `flyctl deploy --remote-only` with `FLY_API_TOKEN`.
+- Update `.github/workflows/pr-check.yml`: on PR → `npm ci && npm run build && npm run check` (lint/typecheck only, no deploy). Drop the Python/ruff steps.
+- Verify a push to `main` deploys and the live URL serves the new app.
+
+**Acceptance Criteria:**
+- [ ] Push to `main` → build + `flyctl deploy` completes in a few minutes
+- [ ] PR triggers build + check only, no deploy
+- [ ] Live Fly URL serves the static app over HTTPS
+
+---
+
+#### Story 8.3 — Iframe Embed & Verify on Production Domain
+
+**Context:** Story 8.2 complete. App live on the existing `bobiverse-tracker` Fly app.
+
+**Tasks:**
+- Confirm `bobiverse.brandonlocke.xyz` (already pointed at this Fly app) serves the static build over HTTPS — DNS/cert are unchanged since the app name is reused, so this is mostly verification.
+- Confirm the personal site iframe `src` still resolves and renders the new app, dark and clean (no `src` change needed unless the path changed).
+- Measure cold-visit load: machine-wake (after idle) vs warm, and record before (Streamlit) vs after (static).
 
 **Acceptance Criteria:**
 - [ ] Custom domain serves the static app over HTTPS
 - [ ] Personal site iframe shows the new app, dark and clean
-- [ ] Cold-visit load dramatically faster than Streamlit (measure + record before/after)
+- [ ] Cold/warm load dramatically faster than Streamlit (measure + record)
 
 ---
 
-#### Story 8.3 — Retire Legacy Streamlit Stack
+#### Story 8.4 — Retire Legacy Streamlit Files
 
-**Context:** New app is live and verified. Remove dead weight.
+**Context:** Static app is live and verified on the production domain. Remove dead weight.
 
 **Tasks:**
-- Remove (or archive) `app/`, root `app.py`, `Dockerfile`, `.dockerignore`, `requirements.txt`, `Pipfile`, `Pipfile.lock`, `.streamlit/`, the Fly deploy workflow, `fly.toml`.
-- Stop/destroy the Fly `bobiverse-tracker` app.
-- Update this README's front matter (Architecture, Tech Stack, Environment) to describe the static architecture.
-- Keep `data/bobs.json` + `data/schema.md` as the data source of truth.
+- Remove (or archive) `app/`, root `app.py`, `requirements.txt`, `Pipfile`, `Pipfile.lock`, `.streamlit/`, `Makefile` Streamlit targets.
+- Keep the Fly app `bobiverse-tracker` running — it now serves the static build. Do **not** destroy it.
+- Update this README's front matter (Architecture, Tech Stack, Environment, Secrets & Config, Definition of Done) to describe the static-on-Fly architecture.
+- Keep `data/bobs.json` + `data/schema.md` as the data source of truth (now consumed at build time by `web/`).
 
 **Acceptance Criteria:**
-- [ ] No Python/Streamlit/Fly references remain in active config
-- [ ] Fly app stopped/destroyed (no further billing)
-- [ ] README front matter reflects the static architecture
-- [ ] Repo builds and deploys solely via the JS toolchain
+- [ ] No Python/Streamlit references remain in active config
+- [ ] Fly app still live, serving the static build
+- [ ] README front matter reflects the static-on-Fly architecture
+- [ ] Repo builds and deploys solely via the JS toolchain + Fly
 
 ---
 
 ### EPIC 8 Integration Gate
 
-- [ ] Cold-visit load time measured + recorded — before (Streamlit) vs after (static)
-- [ ] Push a label change → auto-deploys → visible on the live domain
-- [ ] Legacy stack fully removed; no orphaned Fly machine
+- [ ] Cold/warm load time measured + recorded — before (Streamlit) vs after (static)
+- [ ] Push a label change → auto-deploys to Fly → visible on the live domain
+- [ ] Legacy Streamlit files removed; Fly app serves only the static build
 
-> **Rollback:** The legacy Streamlit app stays deployable until Story 8.3. The new app lives in `web/` and deploys to a separate URL, so cutover is just a DNS + iframe `src` change. To roll back: point DNS at the Fly app and revert the iframe `src`. Do not run Story 8.3 until the static app is verified live on the production domain.
+> **Rollback:** The cutover reuses the `bobiverse-tracker` Fly app, so the swap from Streamlit to static is a single Fly deploy. Until Story 8.4, the Streamlit `Dockerfile`/`app/` remain in git history (and revertable). To roll back: `git revert` the Dockerfile/fly.toml change and redeploy. Do not run Story 8.4 until the static app is verified live on the production domain.
 
 ---
 
