@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bobRecords, minDate, maxDate } from '$lib/data/bobs';
-	import { computePositions, applyJitter } from '$lib/data/positions';
+	import { computePositions } from '$lib/data/positions';
 	import Map from '$lib/Map.svelte';
 
 	// Slider granularity: 1 day, parity with Streamlit's datetime slider
@@ -14,7 +14,7 @@
 	let selectedMs = $state(minMs);
 
 	const selectedDate = $derived(new Date(selectedMs));
-	const positions = $derived(applyJitter(computePositions(bobRecords, selectedDate)));
+	const positions = $derived(computePositions(bobRecords, selectedDate));
 
 	const sliderLabel = $derived(
 		selectedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })

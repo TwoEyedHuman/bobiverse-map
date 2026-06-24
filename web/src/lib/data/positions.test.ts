@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { bobRecords } from './bobs';
-import { applyJitter, computePositions } from './positions';
+import { computePositions } from './positions';
 
-// Fixtures generated from app/data.py:compute_positions + app/map.py:build_map's
-// jitter logic against the same data/bobs.json, to assert JS/Python parity.
+// Fixtures generated from app/data.py:compute_positions against the same
+// data/bobs.json, to assert JS/Python parity of the position math. (The orbit
+// "jitter" from app/map.py is intentionally not ported — the JS map collapses
+// co-located stationary bobs into a single count badge instead.)
 const FIXTURES: Record<
 	string,
 	Array<{
@@ -15,8 +17,6 @@ const FIXTURES: Record<
 		is_traveling: boolean;
 		last_date: string;
 		path: [[number, number], [number, number]] | null;
-		display_x: number;
-		display_y: number;
 	}>
 > = {
 	'2150-06-15': [
@@ -28,9 +28,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Epsilon Eridani',
 			is_traveling: false,
 			last_date: '2145-12-01',
-			path: null,
-			display_x: 11.2,
-			display_y: -2.1
+			path: null
 		},
 		{
 			name: 'Garfield',
@@ -40,9 +38,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Epsilon Eridani',
 			is_traveling: false,
 			last_date: '2145-12-01',
-			path: null,
-			display_x: 9.8,
-			display_y: -2.1
+			path: null
 		},
 		{
 			name: 'Bob',
@@ -55,9 +51,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 29.5],
 				[-2.1, 4.2]
-			],
-			display_x: 15.267119,
-			display_y: -0.519324
+			]
 		},
 		{
 			name: 'Homer',
@@ -70,9 +64,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 0],
 				[-2.1, 0]
-			],
-			display_x: 6.203013,
-			display_y: -1.240603
+			]
 		},
 		{
 			name: 'Mario',
@@ -85,9 +77,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 24.3],
 				[-2.1, -14.5]
-			],
-			display_x: 13.339377,
-			display_y: -4.651324
+			]
 		},
 		{
 			name: 'Milo',
@@ -100,9 +90,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 16.2],
 				[-2.1, -5.8]
-			],
-			display_x: 14.534806,
-			display_y: -4.719085
+			]
 		},
 		{
 			name: 'Riker',
@@ -115,9 +103,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 0],
 				[-2.1, 0]
-			],
-			display_x: 5.977154,
-			display_y: -1.195431
+			]
 		}
 	],
 	'2160-01-01': [
@@ -129,9 +115,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Sol',
 			is_traveling: false,
 			last_date: '2158-03-01',
-			path: null,
-			display_x: 0.7,
-			display_y: 0.0
+			path: null
 		},
 		{
 			name: 'Charles',
@@ -141,9 +125,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Sol',
 			is_traveling: false,
 			last_date: '2158-01-01',
-			path: null,
-			display_x: 0.0,
-			display_y: 0.7
+			path: null
 		},
 		{
 			name: 'Homer',
@@ -153,9 +135,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Sol',
 			is_traveling: false,
 			last_date: '2158-09-01',
-			path: null,
-			display_x: -0.7,
-			display_y: 0.0
+			path: null
 		},
 		{
 			name: 'Riker',
@@ -165,9 +145,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Sol',
 			is_traveling: false,
 			last_date: '2158-11-01',
-			path: null,
-			display_x: -0.0,
-			display_y: -0.7
+			path: null
 		},
 		{
 			name: 'Bill',
@@ -177,9 +155,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Epsilon Eridani',
 			is_traveling: false,
 			last_date: '2158-10-01',
-			path: null,
-			display_x: 11.2,
-			display_y: -2.1
+			path: null
 		},
 		{
 			name: 'Garfield',
@@ -189,9 +165,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Epsilon Eridani',
 			is_traveling: false,
 			last_date: '2145-12-01',
-			path: null,
-			display_x: 10.15,
-			display_y: -1.493782
+			path: null
 		},
 		{
 			name: 'Goku',
@@ -201,9 +175,7 @@ const FIXTURES: Record<
 			status: 'Stationary at Epsilon Eridani',
 			is_traveling: false,
 			last_date: '2150-09-01',
-			path: null,
-			display_x: 10.15,
-			display_y: -2.706218
+			path: null
 		},
 		{
 			name: 'Bob',
@@ -216,9 +188,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 29.5],
 				[-2.1, 4.2]
-			],
-			display_x: 24.451067,
-			display_y: 2.52588
+			]
 		},
 		{
 			name: 'Calvin',
@@ -231,9 +201,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 4.37],
 				[-2.1, 0.2]
-			],
-			display_x: 6.154571,
-			display_y: -0.469578
+			]
 		},
 		{
 			name: 'Linus',
@@ -246,9 +214,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 11.8],
 				[-2.1, -2.5]
-			],
-			display_x: 11.332088,
-			display_y: -2.356027
+			]
 		},
 		{
 			name: 'Mario',
@@ -261,9 +227,7 @@ const FIXTURES: Record<
 			path: [
 				[10.5, 24.3],
 				[-2.1, -14.5]
-			],
-			display_x: 18.809492,
-			display_y: -9.5665
+			]
 		},
 		{
 			name: 'Milo',
@@ -276,9 +240,7 @@ const FIXTURES: Record<
 			path: [
 				[16.2, 19.7],
 				[-5.8, -5.0]
-			],
-			display_x: 18.13635,
-			display_y: -5.357406
+			]
 		}
 	],
 	'2133-06-01': [
@@ -290,20 +252,18 @@ const FIXTURES: Record<
 			status: 'Stationary at Sol',
 			is_traveling: false,
 			last_date: '2133-06-01',
-			path: null,
-			display_x: 0,
-			display_y: 0
+			path: null
 		}
 	]
 };
 
 const TOLERANCE = 1e-5;
 
-function check(jittered: ReturnType<typeof applyJitter>, dateKey: string) {
+function check(positions: ReturnType<typeof computePositions>, dateKey: string) {
 	const expected = FIXTURES[dateKey];
-	expect(jittered).toHaveLength(expected.length);
+	expect(positions).toHaveLength(expected.length);
 
-	const byName = new Map(jittered.map((p) => [p.name, p]));
+	const byName = new Map(positions.map((p) => [p.name, p]));
 
 	for (const exp of expected) {
 		const actual = byName.get(exp.name);
@@ -316,8 +276,6 @@ function check(jittered: ReturnType<typeof applyJitter>, dateKey: string) {
 		expect(actual.status).toBe(exp.status);
 		expect(actual.isTraveling).toBe(exp.is_traveling);
 		expect(actual.lastDate.toISOString().slice(0, 10)).toBe(exp.last_date);
-		expect(actual.displayX).toBeCloseTo(exp.display_x, 5);
-		expect(actual.displayY).toBeCloseTo(exp.display_y, 5);
 
 		if (exp.path === null) {
 			expect(actual.path).toBeNull();
@@ -331,11 +289,10 @@ function check(jittered: ReturnType<typeof applyJitter>, dateKey: string) {
 	}
 }
 
-describe('computePositions + applyJitter (parity with Python)', () => {
+describe('computePositions (parity with Python)', () => {
 	it.each(Object.keys(FIXTURES))('matches Python output for %s', (dateKey) => {
 		const positions = computePositions(bobRecords, new Date(dateKey));
-		const jittered = applyJitter(positions);
-		check(jittered, dateKey);
+		check(positions, dateKey);
 	});
 
 	it('interpolates a traveling bob with correct heading angle', () => {
@@ -344,13 +301,5 @@ describe('computePositions + applyJitter (parity with Python)', () => {
 		expect(bob).toBeDefined();
 		expect(bob!.isTraveling).toBe(true);
 		expect(bob!.angle).toBeCloseTo(71.655566, 5);
-	});
-
-	it('gives co-located stationary bobs distinct jittered positions', () => {
-		const positions = computePositions(bobRecords, new Date('2160-01-01'));
-		const jittered = applyJitter(positions);
-		const atSol = jittered.filter((p) => p.x === 0 && p.y === 0);
-		const displayCoords = atSol.map((p) => `${p.displayX.toFixed(4)},${p.displayY.toFixed(4)}`);
-		expect(new Set(displayCoords).size).toBe(atSol.length);
 	});
 });

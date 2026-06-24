@@ -12,11 +12,6 @@ export interface Position {
 	path: { x: [number, number]; y: [number, number] } | null;
 }
 
-export interface JitteredPosition extends Position {
-	displayX: number;
-	displayY: number;
-}
-
 // Parity with app/data.py:35 (compute_positions)
 export function computePositions(records: BobRecord[], selectedDate: Date): Position[] {
 	const bobOrder: string[] = [];
@@ -90,40 +85,4 @@ export function computePositions(records: BobRecord[], selectedDate: Date): Posi
 	}
 
 	return positions;
-}
-
-// Parity with app/map.py:32 (anti-stacking orbit jitter in build_map)
-export function applyJitter(positions: Position[]): JitteredPosition[] {
-	const clusters = new Map<string, Position[]>();
-	for (const p of positions) {
-		const key = `${roundTo(p.x, 2)},${roundTo(p.y, 2)}`;
-		const cluster = clusters.get(key);
-		if (cluster) cluster.push(p);
-		else clusters.set(key, [p]);
-	}
-
-	const result: JitteredPosition[] = [];
-	for (const cluster of clusters.values()) {
-		const n = cluster.length;
-		cluster.forEach((p, idx) => {
-			let displayX = p.x;
-			let displayY = p.y;
-
-			if (n > 1 && !p.isTraveling) {
-				const offsetRadius = 0.7;
-				const theta = (2 * Math.PI * idx) / n;
-				displayX += offsetRadius * Math.cos(theta);
-				displayY += offsetRadius * Math.sin(theta);
-			}
-
-			result.push({ ...p, displayX, displayY });
-		});
-	}
-
-	return result;
-}
-
-function roundTo(value: number, digits: number): number {
-	const factor = 10 ** digits;
-	return Math.round(value * factor) / factor;
 }

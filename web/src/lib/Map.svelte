@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { SYSTEM_COORDS } from './data/coords';
-	import type { JitteredPosition } from './data/positions';
+	import type { Position } from './data/positions';
 
 	// All bobs share one color (markers, labels, paths), distinct from the
 	// grey star labels / white star markers.
 	const BOB_COLOR = '#ffb454';
 
-	let { positions }: { positions: JitteredPosition[] } = $props();
+	let { positions }: { positions: Position[] } = $props();
 
 	// SVG canvas (rendered responsively via viewBox + preserveAspectRatio).
 	const WIDTH = 960;
@@ -62,14 +62,14 @@
 	// labels around the star.
 	const render = $derived.by(() => {
 		const bobs: BobMarker[] = [];
-		const stationaryGroups = new Map<string, JitteredPosition[]>();
+		const stationaryGroups = new Map<string, Position[]>();
 
 		for (const p of positions) {
 			if (p.isTraveling) {
 				bobs.push({
 					name: p.name,
-					px: scaleX(p.displayX),
-					py: scaleY(p.displayY),
+					px: scaleX(p.x),
+					py: scaleY(p.y),
 					traveling: true,
 					angle: p.angle
 				});
