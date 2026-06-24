@@ -6,23 +6,30 @@ on:
       - main
 
 jobs:
-  lint:
-    name: Lint
+  check:
+    name: Build & Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
-      - name: Install ruff
-        run: pip install ruff
-      - name: Run ruff
-        run: ruff check .
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+      - name: Build
+        working-directory: web
+        run: npm run build
+      - name: Check
+        working-directory: web
+        run: npm run check
 
   deploy:
     name: Deploy to Fly.io
     runs-on: ubuntu-latest
-    needs: lint
+    needs: check
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
