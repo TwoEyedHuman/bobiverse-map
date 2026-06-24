@@ -8,8 +8,8 @@ export const SYSTEM_COORDS: Record<string, [number, number]> = {
 	'82 Eridani': [19.7, -5.0],
 	'Beta Hydri': [24.3, -14.5],
 	'Sigma Draconis': [18.8, 12.1],
-	'Tau Ceti': [11.9, -1.5],
-	'Epsilon Indi': [11.8, -2.5]
+	'Tau Ceti': [14.5, -0.3],
+	'Epsilon Indi': [14.2, -3.2]
 };
 
 export function getCoords(systemName: string): [number, number] {

@@ -4,7 +4,7 @@
 
 	// All bobs share one color (markers, labels, paths), distinct from the
 	// grey star labels / white star markers.
-	const BOB_COLOR = '#ffb454';
+	const BOB_COLOR = '#00e5ff';
 
 	let { positions }: { positions: Position[] } = $props();
 
@@ -32,9 +32,11 @@
 
 	const systems = Object.entries(SYSTEM_COORDS);
 
-	// Triangle-up marker (points up by default), centered on origin; rotated by
-	// `angle` degrees clockwise to face the direction of travel.
-	const TRI = 'M 0,-8 L 7,6 L -7,6 Z';
+	// Von Neumann probe marker: long spindle hull, mid-body ring, twin side
+	// pods, tail thruster flare. Nose points up by default, centered on
+	// origin; the wrapping <g> is rotated by `angle` to face travel direction.
+	const PROBE_HULL = 'M 0,-12 L 2,-6 L 2,9 L 0,12 L -2,9 L -2,-6 Z';
+	const PROBE_FLARE = 'M -1.5,11 L 1.5,11 L 0,15 Z';
 
 	function roundTo(value: number, digits: number): number {
 		const factor = 10 ** digits;
@@ -141,6 +143,7 @@
 		{#each positions as p (p.name)}
 			{#if p.path}
 				<line
+					class="travel-line"
 					x1={scaleX(p.path.x[0])}
 					y1={scaleY(p.path.y[0])}
 					x2={scaleX(p.path.x[1])}
@@ -158,7 +161,13 @@
 		{#each render.bobs as b (b.name)}
 			<g transform={`translate(${b.px}, ${b.py})`}>
 				{#if b.traveling}
-					<path d={TRI} transform={`rotate(${b.angle})`} fill={BOB_COLOR} />
+					<g transform={`rotate(${b.angle})`}>
+						<path d={PROBE_HULL} fill={BOB_COLOR} />
+						<circle cx="0" cy="-3" r="5" fill="none" stroke={BOB_COLOR} stroke-width="1.3" />
+						<circle cx="-6" cy="-1" r="2.2" fill={BOB_COLOR} />
+						<circle cx="6" cy="-1" r="2.2" fill={BOB_COLOR} />
+						<path d={PROBE_FLARE} fill={BOB_COLOR} opacity="0.8" />
+					</g>
 				{:else}
 					<rect x="-4" y="-4" width="8" height="8" fill={BOB_COLOR} />
 				{/if}
@@ -210,5 +219,15 @@
 	.cluster-badge {
 		font-size: 11px;
 		font-weight: 700;
+	}
+
+	.travel-line {
+		animation: dash-flow 0.6s linear infinite;
+	}
+
+	@keyframes dash-flow {
+		to {
+			stroke-dashoffset: -8;
+		}
 	}
 </style>
