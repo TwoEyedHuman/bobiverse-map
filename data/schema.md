@@ -7,7 +7,7 @@ Each record in `bobs.json` represents a single positional log entry for a Bob cl
 | Field | Type | Description |
 |-------|------|-------------|
 | `bob` | string | Name of the Bob clone (e.g. `"Bob"`, `"Riker"`, `"Bill"`) |
-| `system` | string | Star system name. Must match a key in `SYSTEM_COORDS` in `app/data.py` |
+| `system` | string | Star system name. Must match a key in `SYSTEM_COORDS` in `web/src/lib/data/coords.ts` |
 | `assumed_date` | string | ISO 8601 date (`YYYY-MM-DD`). Day is always `01` (month-level precision) |
 
 ## Example
@@ -29,7 +29,7 @@ Each record in `bobs.json` represents a single positional log entry for a Bob cl
 
 ## Known Systems
 
-Defined in `app/data.py` → `SYSTEM_COORDS`:
+Defined in `web/src/lib/data/coords.ts` → `SYSTEM_COORDS`:
 
 - Sol
 - Alpha Centauri
@@ -48,4 +48,4 @@ Defined in `app/data.py` → `SYSTEM_COORDS`:
 
 - Multiple records for the same Bob at the same date → last record wins after sort
 - Dates are month-level precision; the app interpolates travel between consecutive entries
-- No DB; this file is the source of truth. Edit directly and restart the app.
+- No DB; this file is the source of truth. Edit directly and rebuild (`npm run build`).
