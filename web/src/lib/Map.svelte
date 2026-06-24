@@ -117,18 +117,53 @@
 		}
 		return offsets;
 	});
+
+	// Ambient space dust: drifting points, fading in/out as they enter/leave
+	// frame. Sits in its own full-bleed HTML layer (percent-positioned) rather
+	// than the data SVG, so it covers the whole pane instead of being
+	// letterboxed to the SVG's fixed-aspect viewBox. Generated once per
+	// mount — purely decorative, not data-driven.
+	function rand(min: number, max: number): number {
+		return min + Math.random() * (max - min);
+	}
+	const DUST_COUNT = 70;
+	const dust = Array.from({ length: DUST_COUNT }, (_, i) => {
+		const dur = rand(5, 16);
+		return {
+			id: i,
+			leftPct: rand(0, 100),
+			topPct: rand(0, 100),
+			size: rand(1, 3.5),
+			dur,
+			delay: -rand(0, dur),
+			dx: rand(-90, 90),
+			dy: rand(-90, 90),
+			o: rand(0.25, 0.9)
+		};
+	});
 </script>
 
-<svg
-	class="map"
-	viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-	preserveAspectRatio="xMidYMid meet"
-	role="img"
-	aria-label="Bobiverse tactical movement map"
->
-	<rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#111111" />
+<div class="map-wrap">
+	<!-- Full-bleed background + ambient space dust, independent of the SVG's
+	     fixed-aspect viewBox so it fills the whole pane, not just the
+	     letterboxed map area. -->
+	<div class="dust-layer" aria-hidden="true">
+		{#each dust as d (d.id)}
+			<span
+				class="dust-mote"
+				style={`left:${d.leftPct}%; top:${d.topPct}%; width:${d.size}px; height:${d.size}px; --dx:${d.dx}px; --dy:${d.dy}px; --dur:${d.dur}s; --delay:${d.delay}s; --o:${d.o};`}
+			></span>
+		{/each}
+	</div>
 
-	<!-- Star systems -->
+	<svg
+		class="map"
+		viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+		preserveAspectRatio="xMidYMid meet"
+		role="img"
+		aria-label="Bobiverse tactical movement map"
+	>
+		<!-- Star systems -->
 	<g class="systems">
 		{#each systems as [name, coords] (name)}
 			<circle cx={scaleX(coords[0])} cy={scaleY(coords[1])} r="6" fill="#ffffff" opacity="0.3" />
@@ -193,10 +228,33 @@
 			</g>
 		{/each}
 	</g>
-</svg>
+	</svg>
+</div>
 
 <style>
+	.map-wrap {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	.dust-layer {
+		position: absolute;
+		inset: 0;
+		background: #111111;
+		overflow: hidden;
+	}
+
+	.dust-mote {
+		position: absolute;
+		border-radius: 50%;
+		background: #ffffff;
+		animation: dust-drift var(--dur) ease-in-out var(--delay) infinite;
+	}
+
 	.map {
+		position: absolute;
+		inset: 0;
 		width: 100%;
 		height: 100%;
 		display: block;
@@ -228,6 +286,23 @@
 	@keyframes dash-flow {
 		to {
 			stroke-dashoffset: -8;
+		}
+	}
+
+	@keyframes dust-drift {
+		0% {
+			transform: translate(0, 0);
+			opacity: 0;
+		}
+		15% {
+			opacity: var(--o);
+		}
+		85% {
+			opacity: var(--o);
+		}
+		100% {
+			transform: translate(var(--dx), var(--dy));
+			opacity: 0;
 		}
 	}
 </style>
