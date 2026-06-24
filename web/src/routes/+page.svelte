@@ -33,7 +33,7 @@
 
 <main>
 	<div class="timebar">
-		<span class="brand">🌌 BOBIVERSE</span>
+		<span class="brand">BOBIVERSE</span>
 		<label for="timeline">◤ TIMELINE ◢</label>
 		<input
 			id="timeline"

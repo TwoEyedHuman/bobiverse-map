@@ -6,7 +6,7 @@
 </script>
 
 <svelte:head>
-	<title>🌌 Bobiverse Tactical Movement Map</title>
+	<title>Bobiverse Tactical Movement Map</title>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 

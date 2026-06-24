@@ -141,6 +141,23 @@
 			o: rand(0.25, 0.9)
 		};
 	});
+
+	// Occasional shooting stars: long idle stretch, brief bright streak, gone.
+	// Each one loops on its own multi-second cycle so they fire independently
+	// and rarely — kept subtle (low opacity, short visible window).
+	const SHOOTING_STAR_COUNT = 6;
+	const shootingStars = Array.from({ length: SHOOTING_STAR_COUNT }, (_, i) => {
+		const dur = rand(7, 16);
+		return {
+			id: i,
+			leftPct: rand(0, 90),
+			topPct: rand(0, 70),
+			ang: rand(15, 35) * (Math.random() < 0.5 ? 1 : -1),
+			len: rand(140, 260),
+			dur,
+			delay: -rand(0, dur)
+		};
+	});
 </script>
 
 <div class="map-wrap">
@@ -152,6 +169,12 @@
 			<span
 				class="dust-mote"
 				style={`left:${d.leftPct}%; top:${d.topPct}%; width:${d.size}px; height:${d.size}px; --dx:${d.dx}px; --dy:${d.dy}px; --dur:${d.dur}s; --delay:${d.delay}s; --o:${d.o};`}
+			></span>
+		{/each}
+		{#each shootingStars as s (s.id)}
+			<span
+				class="shooting-star"
+				style={`left:${s.leftPct}%; top:${s.topPct}%; --ang:${s.ang}deg; --len:${s.len}px; --dur:${s.dur}s; --delay:${s.delay}s;`}
 			></span>
 		{/each}
 	</div>
@@ -243,6 +266,7 @@
 		inset: 0;
 		background: #111111;
 		overflow: hidden;
+		pointer-events: none;
 	}
 
 	.dust-mote {
@@ -303,6 +327,35 @@
 		100% {
 			transform: translate(var(--dx), var(--dy));
 			opacity: 0;
+		}
+	}
+
+	.shooting-star {
+		position: absolute;
+		width: 90px;
+		height: 1.5px;
+		background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85));
+		transform-origin: left center;
+		opacity: 0;
+		animation: shoot var(--dur) linear var(--delay) infinite;
+	}
+
+	@keyframes shoot {
+		0%,
+		90% {
+			opacity: 0;
+			transform: rotate(var(--ang)) translateX(0);
+		}
+		91% {
+			opacity: 0.7;
+		}
+		96% {
+			opacity: 0;
+			transform: rotate(var(--ang)) translateX(var(--len));
+		}
+		100% {
+			opacity: 0;
+			transform: rotate(var(--ang)) translateX(var(--len));
 		}
 	}
 </style>
