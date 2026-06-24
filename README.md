@@ -1,6 +1,6 @@
 # Bobiverse Bob Tracker
 
-A Streamlit app that visualizes Bob clone locations in space, chapter by chapter, from Dennis E. Taylor's Bobiverse series.
+A static web app that visualizes Bob clone locations in space, chapter by chapter, from Dennis E. Taylor's Bobiverse series.
 
 ---
 
@@ -26,18 +26,18 @@ Browser
 Fly.io Machine (scale to zero)
   │
   ▼
-Streamlit App (Python)
+nginx serving static build
   │
-  ├── Chapter selector (sidebar)
-  ├── Interactive space map (plotly)
-  └── Bob data (JSON/CSV flat file — no DB needed)
+  ├── SvelteKit static app (build-time data load)
+  ├── Interactive space map (canvas/SVG)
+  └── Bob data (JSON flat file — no DB needed)
 ```
 
 ### Key Design Decisions
 
-- **No database** — Bob location data is static (books don't change). A versioned JSON/CSV file in the repo is sufficient and simplest.
+- **No database** — Bob location data is static (books don't change). A versioned JSON file in the repo is sufficient and simplest.
 - **Scale to zero** — app is hosted on a Fly.io Machine with `min_machines_running = 0`. It costs nothing when idle and wakes in ~2-3 seconds on first request.
-- **Streamlit only** — no Go proxy, no Caddy. Fly.io handles TLS and routing directly. The personal site embeds this via iframe using the Fly.io URL.
+- **Static + nginx only** — no Go proxy, no Caddy, no app server. Fly.io handles TLS and routing directly to nginx. The personal site embeds this via iframe using the Fly.io URL.
 - **Extensibility** — adding a new book's data means adding rows to the data file and a new chapter range. No code change required.
 
 ---
@@ -48,20 +48,17 @@ Streamlit App (Python)
 bobiverse-tracker/
 ├── README.md
 ├── fly.toml                   ← Fly.io machine config (scale to zero)
-├── Dockerfile
-├── requirements.txt
-├── .streamlit/
-│   └── config.toml            ← disable toolbar for clean iframe embed
-├── app/
-│   ├── main.py                ← Streamlit entry point
-│   ├── map.py                 ← map rendering logic
-│   ├── data.py                ← data loading + filtering
-│   └── components/
-│       ├── chapter_selector.py
-│       └── bob_info.py
-└── data/
-    ├── bobs.json              ← Bob clone data (name, location, chapter)
-    └── schema.md              ← documents the data format
+├── Dockerfile                 ← multi-stage: npm build → nginx runtime
+├── data/
+│   ├── bobs.json              ← Bob clone data (name, location, chapter)
+│   └── schema.md              ← documents the data format
+└── web/
+    ├── package.json
+    ├── svelte.config.js
+    ├── vite.config.ts
+    └── src/
+        ├── routes/            ← SvelteKit pages
+        └── lib/                ← map rendering, data loading, components
 ```
 
 ---
@@ -70,10 +67,11 @@ bobiverse-tracker/
 
 | Layer | Technology | Reason |
 |---|---|---|
-| App framework | Streamlit | Already in use; great for interactive data apps |
-| Map | Plotly | Interactive 3D/2D space map, works natively in Streamlit |
-| Data | JSON flat file | Static data, no DB overhead |
+| App framework | SvelteKit (static adapter) | Fast static build, no runtime server needed |
+| Map | Custom canvas/SVG rendering | Lightweight, no heavy charting lib dependency |
+| Data | JSON flat file | Static data, no DB overhead, consumed at build time |
 | Hosting | Fly.io (scale to zero) | $0 when idle, fast cold start, Docker-native |
+| Web server | nginx (Alpine) | Serves the static build, minimal image |
 | CI/CD | GitHub Actions | Auto-deploy on push to `main` |
 
 ---
@@ -82,9 +80,9 @@ bobiverse-tracker/
 
 | | Local | Production (Fly.io) |
 |---|---|---|
-| Run command | `streamlit run app/main.py` | Docker via Fly Machine |
-| URL | `http://localhost:8501` | `https://bobiverse.brandonlocke.xyz` |
-| Data | `data/bobs.json` | same file, baked into image |
+| Run command | `cd web && npm run dev` | Docker via Fly Machine (nginx) |
+| URL | `http://localhost:5173` | `https://bobiverse.brandonlocke.xyz` |
+| Data | `data/bobs.json` | same file, baked into static build at image build time |
 | Secrets | none needed | none needed |
 
 ---
@@ -92,16 +90,20 @@ bobiverse-tracker/
 ## Pre-Flight Checklist
 
 ```bash
-# Python env set up
-python --version  # 3.12+
-pip install -r requirements.txt
+# Node env set up
+node --version  # 22+
+cd web && npm ci
 
 # App runs locally
-streamlit run app/main.py
+npm run dev
+
+# App builds
+npm run build
+npm run preview
 
 # Docker builds
-docker build -t bobiverse-tracker .
-docker run -p 8501:8501 bobiverse-tracker
+docker build -t bobiverse-tracker -f Dockerfile .
+docker run -p 8080:80 bobiverse-tracker
 
 # Fly CLI installed
 fly version
@@ -703,10 +705,10 @@ Retired at cutover: Streamlit, pandas, plotly, `Dockerfile`, the Fly app, the Py
 - Keep `data/bobs.json` + `data/schema.md` as the data source of truth (now consumed at build time by `web/`).
 
 **Acceptance Criteria:**
-- [ ] No Python/Streamlit references remain in active config
+- [x] No Python/Streamlit references remain in active config
 - [ ] Fly app still live, serving the static build
-- [ ] README front matter reflects the static-on-Fly architecture
-- [ ] Repo builds and deploys solely via the JS toolchain + Fly
+- [x] README front matter reflects the static-on-Fly architecture
+- [x] Repo builds and deploys solely via the JS toolchain + Fly
 
 ---
 
@@ -722,13 +724,13 @@ Retired at cutover: Streamlit, pandas, plotly, `Dockerfile`, the Fly app, the Py
 
 ## Secrets & Config Management
 
-No secrets required — all data is static and baked into the Docker image. If future features require an API key (e.g. for book data enrichment), add via:
+No secrets required — all data is static and baked into the Docker image at build time. If future features require an API key (e.g. for book data enrichment), add via:
 
 ```bash
 fly secrets set MY_SECRET=value
 ```
 
-And access in Python via `os.environ.get("MY_SECRET")`.
+And access in the SvelteKit build via Vite env vars (`import.meta.env`).
 
 ---
 
@@ -737,7 +739,7 @@ And access in Python via `os.environ.get("MY_SECRET")`.
 A story is complete when:
 
 - [ ] All acceptance criteria pass
-- [ ] App runs correctly via `streamlit run app/main.py`
+- [ ] App runs correctly via `npm run dev` / `npm run build && npm run preview`
 - [ ] App runs correctly via `docker run`
 - [ ] No secrets committed
 - [ ] `data/schema.md` updated if data format changed

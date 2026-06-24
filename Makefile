@@ -1,7 +1,4 @@
-.PHONY: run web web-build web-preview
-
-run:
-	pipenv run streamlit run app.py
+.PHONY: web web-build web-preview
 
 web:
 	cd web && npm run dev
