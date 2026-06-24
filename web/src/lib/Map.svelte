@@ -36,23 +36,82 @@
 	// `angle` degrees clockwise to face the direction of travel.
 	const TRI = 'M 0,-8 L 7,6 L -7,6 Z';
 
-	// Label de-collision. In-transit bobs interpolate freely and aren't orbit-
-	// jittered like co-located stationary ones, so their name labels can land on
-	// top of each other. Greedily stack any colliding label upward by a line.
+	function roundTo(value: number, digits: number): number {
+		const factor = 10 ** digits;
+		return Math.round(value * factor) / factor;
+	}
+
+	interface BobMarker {
+		name: string;
+		px: number;
+		py: number;
+		traveling: boolean;
+		angle: number;
+	}
+	interface ClusterMarker {
+		px: number;
+		py: number;
+		count: number;
+		names: string[];
+	}
+
+	// Split into individually-labeled bobs vs. dense clusters. Travelers and
+	// lone stationary bobs get a marker + name label. Co-located stationary bobs
+	// (e.g. the whole crew parked at 82 Eridani) collapse to one marker with a
+	// count badge — names show on hover — so the map doesn't scatter a ring of
+	// labels around the star.
+	const render = $derived.by(() => {
+		const bobs: BobMarker[] = [];
+		const stationaryGroups = new Map<string, JitteredPosition[]>();
+
+		for (const p of positions) {
+			if (p.isTraveling) {
+				bobs.push({
+					name: p.name,
+					px: scaleX(p.displayX),
+					py: scaleY(p.displayY),
+					traveling: true,
+					angle: p.angle
+				});
+			} else {
+				const key = `${roundTo(p.x, 2)},${roundTo(p.y, 2)}`;
+				const g = stationaryGroups.get(key);
+				if (g) g.push(p);
+				else stationaryGroups.set(key, [p]);
+			}
+		}
+
+		const clusters: ClusterMarker[] = [];
+		for (const g of stationaryGroups.values()) {
+			// Anchor at the true system center, not the orbit-jittered position.
+			const px = scaleX(g[0].x);
+			const py = scaleY(g[0].y);
+			if (g.length === 1) {
+				bobs.push({ name: g[0].name, px, py, traveling: false, angle: 0 });
+			} else {
+				clusters.push({ px, py, count: g.length, names: g.map((b) => b.name) });
+			}
+		}
+
+		return { bobs, clusters };
+	});
+
+	// Label de-collision. In-transit bobs interpolate freely, so their name
+	// labels can land on top of each other. Greedily stack any colliding label
+	// upward by a line.
 	const LABEL_DX = 46; // px horizontal proximity that counts as a collision
 	const LABEL_DY = 13; // line height to bump a colliding label
 	const labelDy = $derived.by(() => {
 		const placed: { x: number; y: number }[] = [];
 		const offsets = new Map<string, number>();
-		for (const p of positions) {
-			const px = scaleX(p.displayX);
-			const baseY = scaleY(p.displayY) - 12;
+		for (const b of render.bobs) {
+			const baseY = b.py - 12;
 			let y = baseY;
-			while (placed.some((q) => Math.abs(q.x - px) < LABEL_DX && Math.abs(q.y - y) < LABEL_DY)) {
+			while (placed.some((q) => Math.abs(q.x - b.px) < LABEL_DX && Math.abs(q.y - y) < LABEL_DY)) {
 				y -= LABEL_DY;
 			}
-			placed.push({ x: px, y });
-			offsets.set(p.name, y - baseY);
+			placed.push({ x: b.px, y });
+			offsets.set(b.name, y - baseY);
 		}
 		return offsets;
 	});
@@ -94,23 +153,34 @@
 		{/each}
 	</g>
 
-	<!-- Bobs (rotated heading triangle + label) -->
+	<!-- Bobs: travelers (triangle) + lone stationary (square), each labeled -->
 	<g class="bobs">
-		{#each positions as p (p.name)}
-			<g transform={`translate(${scaleX(p.displayX)}, ${scaleY(p.displayY)})`}>
-				{#if p.isTraveling}
-					<path d={TRI} transform={`rotate(${p.angle})`} fill={BOB_COLOR} />
+		{#each render.bobs as b (b.name)}
+			<g transform={`translate(${b.px}, ${b.py})`}>
+				{#if b.traveling}
+					<path d={TRI} transform={`rotate(${b.angle})`} fill={BOB_COLOR} />
 				{:else}
 					<rect x="-4" y="-4" width="8" height="8" fill={BOB_COLOR} />
 				{/if}
 				<text
 					class="bob-label"
-					y={-12 + (labelDy.get(p.name) ?? 0)}
+					y={-12 + (labelDy.get(b.name) ?? 0)}
 					text-anchor="middle"
 					fill={BOB_COLOR}
 				>
-					{p.name}
+					{b.name}
 				</text>
+			</g>
+		{/each}
+	</g>
+
+	<!-- Dense stationary clusters: one marker + count badge, names on hover -->
+	<g class="clusters">
+		{#each render.clusters as c (`${c.px},${c.py}`)}
+			<g class="cluster" transform={`translate(${c.px}, ${c.py})`}>
+				<title>{c.names.join('\n')}</title>
+				<rect x="-5" y="-5" width="10" height="10" fill={BOB_COLOR} />
+				<text class="cluster-badge" x="8" y="-3" fill={BOB_COLOR}>{c.count}</text>
 			</g>
 		{/each}
 	</g>
@@ -131,5 +201,14 @@
 	.bob-label {
 		font-size: 12px;
 		font-weight: 600;
+	}
+
+	.cluster {
+		cursor: help;
+	}
+
+	.cluster-badge {
+		font-size: 11px;
+		font-weight: 700;
 	}
 </style>
