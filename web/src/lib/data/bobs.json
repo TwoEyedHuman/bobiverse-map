@@ -312,7 +312,8 @@
   {
     "bob": "Milo",
     "system": "82 Eridani",
-    "assumed_date": "2165-08-01"
+    "assumed_date": "2165-08-01",
+    "dead": true
   },
   {
     "bob": "Bob",
@@ -545,6 +546,22 @@
     "assumed_date": "2176-08-01"
   },
   {
+    "bob": "Howard",
+    "system": "Sol",
+    "assumed_date": "2176-08-01"
+  },
+  {
+    "bob": "Charles",
+    "system": "Sol",
+    "assumed_date": "2176-08-01"
+  },
+  {
+    "bob": "Homer",
+    "system": "Sol",
+    "assumed_date": "2176-08-01",
+    "dead": true
+  },
+  {
     "bob": "Mario",
     "system": "Zeta Tucanae",
     "assumed_date": "2176-11-01"
@@ -607,22 +624,26 @@
   {
     "bob": "Hannibal",
     "system": "82 Eridani",
-    "assumed_date": "2185-04-01"
+    "assumed_date": "2185-04-01",
+    "dead": true
   },
   {
     "bob": "Tom",
     "system": "82 Eridani",
-    "assumed_date": "2185-04-01"
+    "assumed_date": "2185-04-01",
+    "dead": true
   },
   {
     "bob": "Barney",
     "system": "82 Eridani",
-    "assumed_date": "2185-04-01"
+    "assumed_date": "2185-04-01",
+    "dead": true
   },
   {
     "bob": "Elmer",
     "system": "82 Eridani",
-    "assumed_date": "2185-04-01"
+    "assumed_date": "2185-04-01",
+    "dead": true
   },
   {
     "bob": "Bill",

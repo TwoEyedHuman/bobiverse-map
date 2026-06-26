@@ -1,14 +1,17 @@
-.PHONY: dev build docker-build docker-run docker-kill
+.PHONY: dev build generate docker-build docker-run docker-kill
 
 IMAGE := bobiverse-tracker:test
 CONTAINER := bobiverse-tracker
 DOCKER_STAMP := .docker-build-stamp
-DOCKER_SRC := Dockerfile $(shell find web/src web/static -type f) web/package.json web/package-lock.json
+DOCKER_SRC := Dockerfile $(shell find web/src web/static -type f) web/package.json web/package-lock.json "Bobiverse PITs - PITs.csv" csv_to_json.py
+
+generate:
+	python3 csv_to_json.py
 
 dev:
 	cd web && npm run dev
 
-build:
+build: generate
 	cd web && npm run build
 
 $(DOCKER_STAMP): $(DOCKER_SRC)

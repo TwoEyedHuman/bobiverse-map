@@ -34,6 +34,7 @@ export function computePositions(records: BobRecord[], selectedDate: Date): Posi
 		if (past.length === 0) continue;
 
 		const lastEntry = past[past.length - 1];
+		if (lastEntry.dead) continue;
 		const prevCoords = getCoords(lastEntry.system);
 
 		let x = prevCoords[0];

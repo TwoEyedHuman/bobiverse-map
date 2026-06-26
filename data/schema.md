@@ -9,6 +9,7 @@ Each record in `bobs.json` represents a single positional log entry for a Bob cl
 | `bob` | string | Name of the Bob clone (e.g. `"Bob"`, `"Riker"`, `"Bill"`) |
 | `system` | string | Star system name. Must match a key in `SYSTEM_COORDS` in `web/src/lib/data/coords.ts` |
 | `assumed_date` | string | ISO 8601 date (`YYYY-MM-DD`). Day is always `01` (month-level precision) |
+| `dead` | boolean | Optional. `true` marks the Bob as dead at this date. Bob is removed from the map for all dates on or after this entry. Set via the `Dead` column in the CSV (`TRUE`/`yes`/`1`); do not edit `bobs.json` directly. |
 
 ## Example
 
@@ -48,4 +49,5 @@ Defined in `web/src/lib/data/coords.ts` → `SYSTEM_COORDS`:
 
 - Multiple records for the same Bob at the same date → last record wins after sort
 - Dates are month-level precision; the app interpolates travel between consecutive entries
+- To mark a Bob as dead: add a final record with `"dead": true` at the death date. The `system` field should still reflect where they died. The Bob disappears from the map at that date.
 - No DB; this file is the source of truth. Edit directly and rebuild (`npm run build`).
