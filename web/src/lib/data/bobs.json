@@ -295,6 +295,11 @@
     "assumed_date": "2165-04-01"
   },
   {
+    "bob": "Linus",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2165-04-01"
+  },
+  {
     "bob": "Bob",
     "system": "Delta Eridani",
     "assumed_date": "2165-07-01"
@@ -375,8 +380,18 @@
     "assumed_date": "2166-07-01"
   },
   {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2167-02-01"
+  },
+  {
     "bob": "Bill",
     "system": "Epsilon Eridani",
+    "assumed_date": "2167-03-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
     "assumed_date": "2167-03-01"
   },
   {
@@ -393,6 +408,16 @@
     "bob": "Mario",
     "system": "Beta Hydri",
     "assumed_date": "2169-08-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2169-09-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2169-11-01"
   },
   {
     "bob": "Riker",
@@ -413,6 +438,16 @@
     "bob": "Charles",
     "system": "Sol",
     "assumed_date": "2170-10-01"
+  },
+  {
+    "bob": "Mulder",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2170-10-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2170-12-01"
   },
   {
     "bob": "Riker",
@@ -440,14 +475,129 @@
     "assumed_date": "2171-04-01"
   },
   {
+    "bob": "Mulder",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2171-04-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2171-05-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2171-05-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2171-07-01"
+  },
+  {
     "bob": "Bill",
     "system": "Epsilon Eridani",
     "assumed_date": "2172-05-01"
   },
   {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2172-06-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2172-09-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2173-12-01"
+  },
+  {
     "bob": "Bill",
     "system": "Epsilon Eridani",
     "assumed_date": "2174-01-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2174-03-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2174-12-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2175-09-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2175-12-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2176-08-01"
+  },
+  {
+    "bob": "Mario",
+    "system": "Zeta Tucanae",
+    "assumed_date": "2176-11-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2178-02-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2178-03-01"
+  },
+  {
+    "bob": "Riker",
+    "system": "Sol",
+    "assumed_date": "2178-03-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2178-05-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2180-01-01"
+  },
+  {
+    "bob": "Mario",
+    "system": "Gliese 54",
+    "assumed_date": "2180-05-01"
+  },
+  {
+    "bob": "Mario",
+    "system": "Gliese 54",
+    "assumed_date": "2180-11-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2182-07-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2182-09-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2183-01-01"
   },
   {
     "bob": "Khan",
@@ -475,6 +625,31 @@
     "assumed_date": "2185-04-01"
   },
   {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2185-06-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2187-03-01"
+  },
+  {
+    "bob": "Bashful",
+    "system": "Gliese 877",
+    "assumed_date": "2187-11-01"
+  },
+  {
+    "bob": "Hal",
+    "system": "Gliese 877",
+    "assumed_date": "2188-05-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2188-08-01"
+  },
+  {
     "bob": "Howard",
     "system": "Omicron Eridani",
     "assumed_date": "2188-09-01"
@@ -488,5 +663,200 @@
     "bob": "Ernie",
     "system": "Omicron Eridani",
     "assumed_date": "2188-09-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2188-09-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2188-12-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2189-03-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2189-04-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2189-09-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2189-10-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2189-11-01"
+  },
+  {
+    "bob": "Rudy",
+    "system": "Epsilon Indi",
+    "assumed_date": "2190-02-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2190-04-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2191-01-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2192-09-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2193-03-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2193-08-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2193-09-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2195-01-01"
+  },
+  {
+    "bob": "Mulder",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2195-03-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2195-04-01"
+  },
+  {
+    "bob": "Loki",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2195-12-01"
+  },
+  {
+    "bob": "Hal",
+    "system": "Gliese 877",
+    "assumed_date": "2196-04-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Gliese 54",
+    "assumed_date": "2204-10-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2204-10-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2205-04-01"
+  },
+  {
+    "bob": "Claude",
+    "system": "Gamma Pavonis",
+    "assumed_date": "2205-05-01"
+  },
+  {
+    "bob": "Oliver",
+    "system": "Alpha Centauri",
+    "assumed_date": "2205-09-01"
+  },
+  {
+    "bob": "Jacques",
+    "system": "Delta Pavonis",
+    "assumed_date": "2207-02-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2207-03-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2208-01-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "HIP 14101",
+    "assumed_date": "2210-12-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "Omicron Eridani",
+    "assumed_date": "2211-01-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "HIP 14101",
+    "assumed_date": "2211-05-01"
+  },
+  {
+    "bob": "Jacques",
+    "system": "Delta Pavonis",
+    "assumed_date": "2212-09-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2213-06-01"
+  },
+  {
+    "bob": "Howard",
+    "system": "HIP 14101",
+    "assumed_date": "2216-01-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-02-01"
+  },
+  {
+    "bob": "Phineas",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-02-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-05-01"
+  },
+  {
+    "bob": "Bob",
+    "system": "Delta Eridani",
+    "assumed_date": "2220-11-01"
+  },
+  {
+    "bob": "Bill",
+    "system": "Delta Pavonis",
+    "assumed_date": "2221-04-01"
   }
 ]

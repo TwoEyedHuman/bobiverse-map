@@ -9,7 +9,14 @@ export const SYSTEM_COORDS: Record<string, [number, number]> = {
 	'Beta Hydri': [24.3, -14.5],
 	'Sigma Draconis': [18.8, 12.1],
 	'Tau Ceti': [14.5, -0.3],
-	'Epsilon Indi': [14.2, -3.2]
+	'Epsilon Indi': [14.2, -3.2],
+	'Eta Cassiopeiae': [19.4, -1.8],
+	'Delta Pavonis': [19.9, -10.6],
+	'Zeta Tucanae': [28.0, -20.5],
+	'Gamma Pavonis': [30.2, -16.5],
+	'Gliese 54': [20.3, -7.0],
+	'Gliese 877': [23.5, -8.0],
+	'HIP 14101': [49.3, 8.5]
 };
 
 export function getCoords(systemName: string): [number, number] {
