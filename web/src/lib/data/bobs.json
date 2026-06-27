@@ -1105,5 +1105,88 @@
     "system": "Delta Pavonis",
     "assumed_date": "2221-04-01",
     "dead": true
+  },
+  {
+    "bob": "Goku",
+    "system": "Alpha Centauri",
+    "assumed_date": "2163-11-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-04-01"
+  },
+  {
+    "bob": "Luke",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-04-01"
+  },
+  {
+    "bob": "Bender",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-04-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-07-01"
+  },
+  {
+    "bob": "Luke",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-07-01"
+  },
+  {
+    "bob": "Bender",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-07-01"
+  },
+  {
+    "bob": "Bender",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-08-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2165-10-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2166-01-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2166-05-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2166-06-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2166-07-01"
+  },
+  {
+    "bob": "Fred",
+    "system": "82 Eridani",
+    "assumed_date": "2185-04-01",
+    "dead": true
+  },
+  {
+    "bob": "Jackson",
+    "system": "82 Eridani",
+    "assumed_date": "2185-04-01",
+    "dead": true
+  },
+  {
+    "bob": "Hector",
+    "system": "82 Eridani",
+    "assumed_date": "2185-04-01",
+    "dead": true
   }
 ]
