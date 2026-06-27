@@ -787,11 +787,6 @@
   },
   {
     "bob": "Bill",
-    "system": "Gliese 54",
-    "assumed_date": "2204-10-01"
-  },
-  {
-    "bob": "Bill",
     "system": "Epsilon Eridani",
     "assumed_date": "2204-10-01"
   },
@@ -879,5 +874,236 @@
     "bob": "Bill",
     "system": "Delta Pavonis",
     "assumed_date": "2221-04-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2167-02-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2167-03-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2169-09-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2169-11-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2171-05-01"
+  },
+  {
+    "bob": "Garfield",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2171-05-01"
+  },
+  {
+    "bob": "Charles",
+    "system": "Sol",
+    "assumed_date": "2171-07-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2172-06-01"
+  },
+  {
+    "bob": "Marvin",
+    "system": "Delta Eridani",
+    "assumed_date": "2173-12-01"
+  },
+  {
+    "bob": "Linus",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2178-05-01"
+  },
+  {
+    "bob": "Bashful",
+    "system": "Gliese 54",
+    "assumed_date": "2180-05-01"
+  },
+  {
+    "bob": "Dopey",
+    "system": "Gliese 54",
+    "assumed_date": "2180-05-01"
+  },
+  {
+    "bob": "Sleepy",
+    "system": "Gliese 54",
+    "assumed_date": "2180-05-01"
+  },
+  {
+    "bob": "Hungry",
+    "system": "Gliese 54",
+    "assumed_date": "2180-05-01"
+  },
+  {
+    "bob": "Garfield",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2187-03-01"
+  },
+  {
+    "bob": "Bashful",
+    "system": "Gliese 877",
+    "assumed_date": "2188-01-01",
+    "dead": true
+  },
+  {
+    "bob": "Garfield",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2188-08-01"
+  },
+  {
+    "bob": "Marcus",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2195-03-01"
+  },
+  {
+    "bob": "Monty",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2195-03-01"
+  },
+  {
+    "bob": "Dexter",
+    "system": "Omicron Eridani",
+    "assumed_date": "2195-04-01"
+  },
+  {
+    "bob": "Elmer",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01"
+  },
+  {
+    "bob": "Verne",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01"
+  },
+  {
+    "bob": "Surly",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01"
+  },
+  {
+    "bob": "Hank",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01"
+  },
+  {
+    "bob": "Jeffrey",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01",
+    "dead": true
+  },
+  {
+    "bob": "Milton",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01",
+    "dead": true
+  },
+  {
+    "bob": "Zeke",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01",
+    "dead": true
+  },
+  {
+    "bob": "Garfield",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2195-12-01"
+  },
+  {
+    "bob": "Mulder",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2201-11-01"
+  },
+  {
+    "bob": "Marcus",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2201-11-01"
+  },
+  {
+    "bob": "Monty",
+    "system": "Eta Cassiopeiae",
+    "assumed_date": "2201-11-01"
+  },
+  {
+    "bob": "Garfield",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2207-03-01"
+  },
+  {
+    "bob": "Garfield",
+    "system": "Epsilon Eridani",
+    "assumed_date": "2210-12-01"
+  },
+  {
+    "bob": "Jacques",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-02-01"
+  },
+  {
+    "bob": "Ferb",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-02-01"
+  },
+  {
+    "bob": "Jacques",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-05-01"
+  },
+  {
+    "bob": "Medeiros",
+    "system": "82 Eridani",
+    "assumed_date": "2165-08-01"
+  },
+  {
+    "bob": "Medeiros",
+    "system": "82 Eridani",
+    "assumed_date": "2185-04-01"
+  },
+  {
+    "bob": "Medeiros",
+    "system": "82 Eridani",
+    "assumed_date": "2195-11-01",
+    "dead": true
+  },
+  {
+    "bob": "Others",
+    "system": "Beta Hydri",
+    "assumed_date": "2169-08-01"
+  },
+  {
+    "bob": "Others",
+    "system": "Zeta Tucanae",
+    "assumed_date": "2176-11-01"
+  },
+  {
+    "bob": "Others",
+    "system": "Gliese 877",
+    "assumed_date": "2187-11-01"
+  },
+  {
+    "bob": "Others",
+    "system": "Gliese 54",
+    "assumed_date": "2204-10-01"
+  },
+  {
+    "bob": "Others",
+    "system": "Delta Pavonis",
+    "assumed_date": "2217-02-01"
+  },
+  {
+    "bob": "Others",
+    "system": "Delta Pavonis",
+    "assumed_date": "2221-04-01",
+    "dead": true
   }
 ]
