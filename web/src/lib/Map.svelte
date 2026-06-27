@@ -2,9 +2,15 @@
 	import { SYSTEM_COORDS } from './data/coords';
 	import type { Position } from './data/positions';
 
-	// All bobs share one color (markers, labels, paths), distinct from the
-	// grey star labels / white star markers.
-	const BOB_COLOR = '#00e5ff';
+	const DEFAULT_COLOR = '#00e5ff';
+	const MEDEIROS_COLOR = '#ff9900';
+	const OTHERS_COLOR = '#ff3333';
+
+	function bobColor(name: string): string {
+		if (name === 'Medeiros') return MEDEIROS_COLOR;
+		if (name === 'Others') return OTHERS_COLOR;
+		return DEFAULT_COLOR;
+	}
 
 	let { positions }: { positions: Position[] } = $props();
 
@@ -206,7 +212,7 @@
 					y1={scaleY(p.path.y[0])}
 					x2={scaleX(p.path.x[1])}
 					y2={scaleY(p.path.y[1])}
-					stroke={BOB_COLOR}
+					stroke={bobColor(p.name)}
 					stroke-width="1.5"
 					stroke-dasharray="4 4"
 				/>
@@ -220,20 +226,20 @@
 			<g transform={`translate(${b.px}, ${b.py})`}>
 				{#if b.traveling}
 					<g transform={`rotate(${b.angle})`}>
-						<path d={PROBE_HULL} fill={BOB_COLOR} />
-						<circle cx="0" cy="-3" r="5" fill="none" stroke={BOB_COLOR} stroke-width="1.3" />
-						<circle cx="-6" cy="-1" r="2.2" fill={BOB_COLOR} />
-						<circle cx="6" cy="-1" r="2.2" fill={BOB_COLOR} />
-						<path d={PROBE_FLARE} fill={BOB_COLOR} opacity="0.8" />
+						<path d={PROBE_HULL} fill={bobColor(b.name)} />
+						<circle cx="0" cy="-3" r="5" fill="none" stroke={bobColor(b.name)} stroke-width="1.3" />
+						<circle cx="-6" cy="-1" r="2.2" fill={bobColor(b.name)} />
+						<circle cx="6" cy="-1" r="2.2" fill={bobColor(b.name)} />
+						<path d={PROBE_FLARE} fill={bobColor(b.name)} opacity="0.8" />
 					</g>
 				{:else}
-					<rect x="-4" y="-4" width="8" height="8" fill={BOB_COLOR} />
+					<rect x="-4" y="-4" width="8" height="8" fill={bobColor(b.name)} />
 				{/if}
 				<text
 					class="bob-label"
 					y={-12 + (labelDy.get(b.name) ?? 0)}
 					text-anchor="middle"
-					fill={BOB_COLOR}
+					fill={bobColor(b.name)}
 				>
 					{b.name}
 				</text>
@@ -246,8 +252,8 @@
 		{#each render.clusters as c (`${c.px},${c.py}`)}
 			<g class="cluster" transform={`translate(${c.px}, ${c.py})`}>
 				<title>{c.names.join('\n')}</title>
-				<rect x="-5" y="-5" width="10" height="10" fill={BOB_COLOR} />
-				<text class="cluster-badge" x="8" y="-3" fill={BOB_COLOR}>{c.count}</text>
+				<rect x="-5" y="-5" width="10" height="10" fill={bobColor(c.names[0])} />
+				<text class="cluster-badge" x="8" y="-3" fill={bobColor(c.names[0])}>{c.count}</text>
 			</g>
 		{/each}
 	</g>
